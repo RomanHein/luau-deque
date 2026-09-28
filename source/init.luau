@@ -1,0 +1,208 @@
+--[[
+	Deque.luau
+	
+	An object that keeps the order of items that were added while
+	offering the first and last item that was added.
+]]
+
+----------------------------------------------------------------------
+-- TYPES
+----------------------------------------------------------------------
+
+type DequeClass = {
+	new: typeof(
+		--[[
+			Creates a Deque.
+		]]
+		function(): Deque<unknown>
+		end
+	),
+}
+
+export type Deque<T> = {
+	AddFront: typeof(
+		--[[
+			Adds an item to the front of a Deque.
+		]]
+		function(deque: Deque<T>, item: T): ()
+		end
+	),
+	
+	AddBack: typeof(
+		--[[
+			Adds an item to the back of a Deque.
+		]]
+		function(deque: Deque<T>, item: T): ()
+		end
+	),
+	
+	PopFront: typeof(
+		--[[
+			Removes the item at the front of a Deque and returns it.
+		]]
+		function(deque: Deque<T>): T
+		end
+	),
+	
+	PopBack: typeof(
+		--[[
+			Removes the item at the back of a Deque and returns it.
+		]]
+		function(deque: Deque<T>): T
+		end
+	),
+	
+	PeekFront: typeof(
+		--[[
+			Checks the front of a Deque.
+		]]
+		function(deque: Deque<T>): T?
+		end
+	),
+	
+	PeekBack: typeof(
+		--[[
+			Checks the back of a Deque.
+		]]
+		function(deque: Deque<T>): T?
+		end
+	),
+	
+	Clear: typeof(
+		--[[
+			Removes all items of a Deque.
+		]]
+		function(deque: Deque<T>): ()
+		end
+	),
+	
+	IsEmpty: typeof(
+		--[[
+			Checks whether a Deque contains any items.
+		]]
+		function(deque: Deque<T>): boolean
+		end
+	),
+	
+	[number]: T,
+}
+
+----------------------------------------------------------------------
+-- FUNCTIONS
+----------------------------------------------------------------------
+
+local function iterator(deque, index)
+	local first = deque._first + index
+	
+	if first > deque._last then
+		return nil
+	end
+	
+	local item = deque._array[first]
+	
+	return index + 1, item
+end
+
+----------------------------------------------------------------------
+-- IMPLEMENTATION
+----------------------------------------------------------------------
+
+local Deque = {} :: DequeClass
+Deque.__index = Deque
+
+function Deque.new()
+	return setmetatable({
+		_array = {},
+		_first = 0,
+		_last = -1,
+	}, Deque)
+end
+
+function Deque:AddFront(item)
+	local first = self._first - 1
+	self._first = first
+	self._array[first] = item
+end
+
+function Deque:AddBack(item)
+	local last = self._last + 1
+	self._last = last
+	self._array[last] = item
+end
+
+function Deque:PopFront()
+	if self._first > self._last then
+		error("LogicalError: popping front of empty deque", 2)
+	end
+	
+	local first = self._first
+	local item = self._array[first]
+	
+	self._first = first + 1
+	self._array[first] = nil
+	
+	if self._first > self._last then
+		self._first = 0
+		self._last = -1
+	end
+	
+	return item
+end
+
+function Deque:PopBack()
+	if self._first > self._last then
+		error("LogicalError: popping back of empty deque", 2)
+	end
+
+	local last = self._last
+	local item = self._array[last]
+
+	self._last = last - 1
+	self._array[last] = nil
+	
+	if self._first > self._last then
+		self._first = 0
+		self._last = -1
+	end
+
+	return item
+end
+
+function Deque:PeekFront()
+	return self._array[self._first]
+end
+
+function Deque:PeekBack()
+	return self._array[self._last]
+end
+
+function Deque:Clear()
+	table.clear(self._array)
+	self._first = 0
+	self._last = -1
+end
+
+function Deque:IsEmpty()
+	return self._first > self._last
+end
+
+----------------------------------------------------------------------
+-- METAMETHODS
+----------------------------------------------------------------------
+
+function Deque:__tostring()
+	local front = self._array[self._first]
+	local back = self._array[self._last]
+
+	return string.format("Deque(%s, %s)", tostring(front), tostring(back))
+end
+
+function Deque:__iter()
+	return iterator, self, 0
+end
+
+function Deque:__len()
+	return self._last - self._first + 1
+end
+
+return Deque

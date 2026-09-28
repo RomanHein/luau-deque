@@ -12,8 +12,8 @@
 
 [AddFront](#addfront)  
 [AddBack](#addback)  
-[PopFront](#popfront)  
-[PopBack](#popback)  
+[RemoveFront](#removefront)  
+[RemoveBack](#removeback)  
 [PeekFront](#peekfront)  
 [PeekBack](#peekback)  
 [Clear](#clear)  
@@ -117,7 +117,7 @@ print(deque)
 Deque(5, 10)
 ```
 
-## PopFront
+## RemoveFront
 
 > Removes the item at the front of a Deque and returns it.
 
@@ -129,7 +129,7 @@ Deque(5, 10)
 
 | Name | Type | Description |
 | --- | --- | --- |
-| deque | Deque\<T\> | The Deque to pop |
+| deque | Deque\<T\> | The Deque to remove from |
 
 **Returns**
 
@@ -145,14 +145,14 @@ local deque = Deque.new()
 deque:AddBack(5)
 deque:AddBack(10)
 
-print(deque:PopFront())
+print(deque:RemoveFront())
 ```
 
 ```text
 5
 ```
 
-## PopBack
+## RemoveBack
 
 > Removes the item at the back of a Deque and returns it.
 
@@ -164,7 +164,7 @@ print(deque:PopFront())
 
 | Name | Type | Description |
 | --- | --- | --- |
-| deque | Deque\<T\> | The Deque to pop |
+| deque | Deque\<T\> | The Deque to remove from |
 
 **Returns**
 
@@ -180,7 +180,7 @@ local deque = Deque.new()
 deque:AddBack(5)
 deque:AddBack(10)
 
-print(deque:PopBack())
+print(deque:RemoveBack())
 ```
 
 ```text

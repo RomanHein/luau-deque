@@ -2,7 +2,7 @@
 	Deque.luau
 	
 	An object that keeps the order of items that were added while
-	offering the first and last item that was added.
+	exposing the first and last item that was added.
 ]]
 
 ----------------------------------------------------------------------
@@ -36,7 +36,7 @@ export type Deque<T> = {
 		end
 	),
 	
-	PopFront: typeof(
+	RemoveFront: typeof(
 		--[[
 			Removes the item at the front of a Deque and returns it.
 		]]
@@ -44,7 +44,7 @@ export type Deque<T> = {
 		end
 	),
 	
-	PopBack: typeof(
+	RemoveBack: typeof(
 		--[[
 			Removes the item at the back of a Deque and returns it.
 		]]
@@ -130,7 +130,7 @@ function Deque:AddBack(item)
 	self._array[last] = item
 end
 
-function Deque:PopFront()
+function Deque:RemoveFront()
 	if self._first > self._last then
 		error("LogicalError: popping front of empty deque", 2)
 	end
@@ -149,7 +149,7 @@ function Deque:PopFront()
 	return item
 end
 
-function Deque:PopBack()
+function Deque:RemoveBack()
 	if self._first > self._last then
 		error("LogicalError: popping back of empty deque", 2)
 	end

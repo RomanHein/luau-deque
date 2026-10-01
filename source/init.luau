@@ -24,18 +24,18 @@ export type Deque<T> = {
 		--[[
 			Adds an item to the front of a Deque.
 		]]
-		function(deque: Deque<T>, item: T): ()
+		function(deque: Deque<T>, item: T): () 
 		end
 	),
-	
+
 	AddBack: typeof(
 		--[[
 			Adds an item to the back of a Deque.
 		]]
-		function(deque: Deque<T>, item: T): ()
+		function(deque: Deque<T>, item: T): () 
 		end
 	),
-	
+
 	RemoveFront: typeof(
 		--[[
 			Removes the item at the front of a Deque and returns it.
@@ -43,47 +43,47 @@ export type Deque<T> = {
 		function(deque: Deque<T>): T
 		end
 	),
-	
+
 	RemoveBack: typeof(
 		--[[
 			Removes the item at the back of a Deque and returns it.
 		]]
-		function(deque: Deque<T>): T
+		function(deque: Deque<T>): T 
 		end
 	),
-	
+
 	PeekFront: typeof(
 		--[[
 			Checks the front of a Deque.
 		]]
-		function(deque: Deque<T>): T?
+		function(deque: Deque<T>): T? 
 		end
 	),
-	
+
 	PeekBack: typeof(
 		--[[
 			Checks the back of a Deque.
 		]]
-		function(deque: Deque<T>): T?
+		function(deque: Deque<T>): T? 
 		end
 	),
-	
+
 	Clear: typeof(
 		--[[
 			Removes all items of a Deque.
 		]]
-		function(deque: Deque<T>): ()
+		function(deque: Deque<T>): () 
 		end
 	),
-	
+
 	IsEmpty: typeof(
 		--[[
 			Checks whether a Deque contains any items.
 		]]
-		function(deque: Deque<T>): boolean
+		function(deque: Deque<T>): boolean 
 		end
 	),
-	
+
 	[number]: T,
 }
 
@@ -91,15 +91,15 @@ export type Deque<T> = {
 -- FUNCTIONS
 ----------------------------------------------------------------------
 
-local function iterator(deque, index)
-	local first = deque._first + index
-	
-	if first > deque._last then
+local function iterate(deque, index)
+	local current = deque._first + index
+
+	if current > deque._last then
 		return nil
 	end
-	
-	local item = deque._array[first]
-	
+
+	local item = deque._array[current]
+
 	return index + 1, item
 end
 
@@ -131,36 +131,42 @@ function Deque:AddBack(item)
 end
 
 function Deque:RemoveFront()
-	if self._first > self._last then
-		error("LogicalError: popping front of empty deque", 2)
+	local first = self._first
+	local last = self._last
+	
+	if first > last then
+		error("cannot remove front item from an empty queue", 2)
 	end
 	
-	local first = self._first
-	local item = self._array[first]
+	local array = self._array
+	local item = array[first]
 	
 	self._first = first + 1
-	self._array[first] = nil
-	
-	if self._first > self._last then
+	array[first] = nil
+
+	if first + 1 > last then
 		self._first = 0
 		self._last = -1
 	end
-	
+
 	return item
 end
 
 function Deque:RemoveBack()
-	if self._first > self._last then
-		error("LogicalError: popping back of empty deque", 2)
-	end
-
+	local first = self._first
 	local last = self._last
-	local item = self._array[last]
+	
+	if first > last then
+		error("cannot remove back item from an empty queue", 2)
+	end
+	
+	local array = self._array
+	local item = array[last]
 
 	self._last = last - 1
-	self._array[last] = nil
-	
-	if self._first > self._last then
+	array[last] = nil
+
+	if first > last - 1 then
 		self._first = 0
 		self._last = -1
 	end
@@ -191,14 +197,14 @@ end
 ----------------------------------------------------------------------
 
 function Deque:__tostring()
-	local front = self._array[self._first]
-	local back = self._array[self._last]
-
-	return string.format("Deque(%s, %s)", tostring(front), tostring(back))
+	local front = tostring(self._array[self._first])
+	local back = tostring(self._array[self._last])
+	
+	return "Deque("..front..", "..back..")"
 end
 
 function Deque:__iter()
-	return iterator, self, 0
+	return iterate, self, 0
 end
 
 function Deque:__len()

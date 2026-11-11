@@ -1,0 +1,16 @@
+{
+  "name": "Deque",
+  "tree": {
+    "$className": "DataModel",
+
+    "ServerScriptService": {
+      "Source": {
+        "$path": "source"
+      },
+
+      "Tests": {
+        "$path": "tests"
+      }
+    }
+  }
+}

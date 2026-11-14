@@ -36,10 +36,6 @@ local function format_time(time)
 end
 
 local function benchmark(name, iterations, callback, ...)
-    for _ = 1, 5 do
-        callback(...)
-    end
-
     local samples = table_create(iterations, nil)
     local elapsed = 0
     local total = 0
@@ -63,8 +59,8 @@ end
 -- SOURCE
 --------------------------------------------------------------------------------
 
-local deque = Deque.new()
+local d = Deque.new()
 
-benchmark("deque", 100_000, function()
-    deque:PushBack(1)
+benchmark("d", 257, function()
+    d:PushFront(1)
 end)

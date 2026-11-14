@@ -12,12 +12,8 @@ local Deque = require("../Source/Deque")
 -- SOURCE
 --------------------------------------------------------------------------------
 
-local deque = Deque.new()
+local d = Deque.new()
 
-for i = 1, 10 do
-    deque:PushBack(i)
-end
-
-for i = 1, 10 do
-    print(deque:PopFront())
+for _ = 1, 257 do
+    d:PushBack(1)
 end

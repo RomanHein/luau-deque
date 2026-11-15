@@ -121,7 +121,41 @@ function Deque:PushBack(item)
 end
 
 function Deque:PopFront()
-   
+    local front_cursor = self._front_cursor + 1
+    local back_cursor = self._back_cursor - 1
+
+    if front_cursor < back_cursor then
+        local directory = self._directory
+
+        local front_chunk_index = bit32_rshift(front_cursor, 6)
+        local item_index = bit32_band(front_cursor, 63) + 1
+        local chunk = directory[front_chunk_index]
+        local item = chunk[item_index]
+
+        chunk[item_index] = nil
+        self._front_cursor = front_cursor
+
+        return item
+    end
+
+    if front_cursor > back_cursor then
+        return nil
+    end
+
+    local directory = self._directory
+    local directory_size = self._directory_size
+
+    local new_front_cursor = bit32_lshift(directory_size, 5) + 63
+    local front_chunk_index = bit32_rshift(front_cursor, 6)
+    local item_index = bit32_band(front_cursor, 63) + 1
+    local chunk = directory[front_chunk_index]
+    local item = chunk[item_index]
+    
+    chunk[item_index] = nil
+    self._front_cursor = new_front_cursor
+    self._back_cursor = new_front_cursor + 1
+
+    return item
 end
 
 function Deque:PopBack()

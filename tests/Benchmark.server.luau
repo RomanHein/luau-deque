@@ -59,8 +59,3 @@ end
 -- SOURCE
 --------------------------------------------------------------------------------
 
-local d = Deque.new()
-
-benchmark("d", 257, function()
-    d:PushFront(1)
-end)

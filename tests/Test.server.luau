@@ -14,5 +14,14 @@ local Deque = require("../Source/Deque")
 
 local deque = Deque.new()
 
-deque:PushBack(1)
-print(deque:PopFront())
+for i = 1, 256 do
+    deque:PushFront(i)
+end
+
+deque:PushFront(257)
+
+for i = 258, 512 do
+    deque:PushFront(i)
+end
+
+deque:PushFront(513)

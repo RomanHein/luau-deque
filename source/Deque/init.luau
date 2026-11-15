@@ -226,4 +226,11 @@ function Deque:PopBack()
     return item
 end
 
+function Deque:IsEmpty()
+    local front_cursor = self._front_cursor + 1
+    local back_cursor = self._back_cursor - 1
+
+    return front_cursor > back_cursor
+end
+
 return Deque

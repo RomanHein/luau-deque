@@ -237,4 +237,16 @@ function Deque:IsEmpty()
     return self._front_cursor + 1 > self._back_cursor - 1
 end
 
+--------------------------------------------------------------------------------
+-- META METHODS
+--------------------------------------------------------------------------------
+
+function Deque:__tostring()
+    return "Deque"
+end
+
+function Deque:__len()
+    return self._back_cursor - self._front_cursor - 1
+end
+
 return Deque

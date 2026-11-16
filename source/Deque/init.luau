@@ -226,6 +226,40 @@ function Deque:PopBack()
     return item
 end
 
+function Deque:PeekFront()
+    local front_cursor = self._front_cursor + 1
+    local back_cursor = self._back_cursor - 1
+
+    if front_cursor > back_cursor then
+        return nil
+    end
+
+    local directory = self._directory
+    local front_chunk_index = front_cursor // CHUNK_SIZE
+    local slot_index = front_cursor % CHUNK_SIZE + 1
+    local chunk = directory[front_chunk_index]
+    local item = chunk[slot_index]
+
+    return item
+end
+
+function Deque:PeekBack()
+    local front_cursor = self._front_cursor + 1
+    local back_cursor = self._back_cursor - 1
+
+    if front_cursor > back_cursor then
+        return nil
+    end
+
+    local directory = self._directory
+    local back_chunk_index = back_cursor // CHUNK_SIZE
+    local slot_index = back_cursor % CHUNK_SIZE + 1
+    local chunk = directory[back_chunk_index]
+    local item = chunk[slot_index]
+
+    return item
+end
+
 function Deque:Clear()
     self._directory = table_create(INITIAL_DIRECTORY_SIZE)
     self._directory_size = INITIAL_DIRECTORY_SIZE

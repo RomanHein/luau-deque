@@ -18,4 +18,6 @@ for i = 1, 256 do
     deque:PushFront(i)
 end
 
-print(deque:PeekFront())
+for it, item in deque do
+    print(item)
+end

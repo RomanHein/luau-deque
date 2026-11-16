@@ -21,6 +21,26 @@ local table_create = table.create
 local table_move = table.move
 
 --------------------------------------------------------------------------------
+-- FUNCTIONS
+--------------------------------------------------------------------------------
+
+local function iterate(self, traversal_cursor)
+    local back_cursor = self._back_cursor - 1
+
+    if traversal_cursor > back_cursor then
+        return nil
+    end
+
+    local directory = self._directory
+    local chunk_index = traversal_cursor // CHUNK_SIZE
+    local slot_index = traversal_cursor % CHUNK_SIZE + 1
+    local chunk = directory[chunk_index]
+    local item = chunk[slot_index]
+
+    return traversal_cursor + 1, item
+end
+
+--------------------------------------------------------------------------------
 -- CLASS INITIALIZATION
 --------------------------------------------------------------------------------
 
@@ -281,6 +301,10 @@ end
 
 function Deque:__len()
     return self._back_cursor - self._front_cursor - 1
+end
+
+function Deque:__iter()
+    return iterate, self, self._front_cursor + 1
 end
 
 return Deque

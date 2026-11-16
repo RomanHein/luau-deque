@@ -8,4 +8,4 @@ All notable changes will be documented here.
 
 - Inspection of front item via `PeekFront()` 
 - Inspection of back item via `PeekBack()`
-- Generalized iteration via `__iter`
+- Generalized iteration via `__iter()`

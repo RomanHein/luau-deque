@@ -33,9 +33,9 @@ local function iterate(self, traversal_cursor)
 
     local directory = self._directory
     local chunk_index = traversal_cursor // CHUNK_SIZE
-    local item_index = traversal_cursor % CHUNK_SIZE + 1
+    local item_slot = traversal_cursor % CHUNK_SIZE + 1
     local chunk = directory[chunk_index]
-    local item = chunk[item_index]
+    local item = chunk[item_slot]
 
     return traversal_cursor + 1, item
 end
@@ -68,7 +68,7 @@ function Deque:PushFront(item)
     local directory = self._directory
     local front_cursor = self._front_cursor
     local front_chunk_index = front_cursor // CHUNK_SIZE
-    local item_index = front_cursor % CHUNK_SIZE + 1
+    local slot = front_cursor % CHUNK_SIZE + 1
     local chunk = directory[front_chunk_index]
 
     if not chunk then
@@ -112,7 +112,7 @@ function Deque:PushFront(item)
         directory[front_chunk_index] = chunk
     end
 
-    chunk[item_index] = item
+    chunk[slot] = item
     self._front_cursor = front_cursor - 1
 end
 
@@ -120,7 +120,7 @@ function Deque:PushBack(item)
     local directory = self._directory
     local back_cursor = self._back_cursor
     local back_chunk_index = back_cursor // CHUNK_SIZE
-    local item_index = back_cursor % CHUNK_SIZE + 1
+    local slot = back_cursor % CHUNK_SIZE + 1
     local chunk = directory[back_chunk_index]
 
     if not chunk then
@@ -165,7 +165,7 @@ function Deque:PushBack(item)
         directory[back_chunk_index] = chunk
     end
 
-    chunk[item_index] = item
+    chunk[slot] = item
     self._back_cursor = back_cursor + 1
 end
 
@@ -179,9 +179,9 @@ function Deque:PopFront()
 
     local directory = self._directory
     local front_chunk_index = front_cursor // CHUNK_SIZE
-    local item_index = front_cursor % CHUNK_SIZE + 1
+    local slot = front_cursor % CHUNK_SIZE + 1
     local chunk = directory[front_chunk_index]
-    local item = chunk[item_index]
+    local item = chunk[slot]
 
     if front_cursor == back_cursor then
         local directory_size = self._directory_size
@@ -190,7 +190,7 @@ function Deque:PopFront()
         self._back_cursor = back_cursor
     end
 
-    chunk[item_index] = nil
+    chunk[slot] = nil
     self._front_cursor = front_cursor
 
     return item
@@ -206,9 +206,9 @@ function Deque:PopBack()
 
     local directory = self._directory
     local back_chunk_index = back_cursor // CHUNK_SIZE
-    local item_index = back_cursor % CHUNK_SIZE + 1
+    local slot = back_cursor % CHUNK_SIZE + 1
     local chunk = directory[back_chunk_index]
-    local item = chunk[item_index]
+    local item = chunk[slot]
 
     if front_cursor == back_cursor then
         local directory_size = self._directory_size
@@ -217,7 +217,7 @@ function Deque:PopBack()
         self._front_cursor = front_cursor
     end
 
-    chunk[item_index] = nil
+    chunk[slot] = nil
     self._back_cursor = back_cursor
 
     return item
@@ -233,9 +233,9 @@ function Deque:PeekFront()
 
     local directory = self._directory
     local front_chunk_index = front_cursor // CHUNK_SIZE
-    local item_index = front_cursor % CHUNK_SIZE + 1
+    local slot = front_cursor % CHUNK_SIZE + 1
     local chunk = directory[front_chunk_index]
-    local item = chunk[item_index]
+    local item = chunk[slot]
 
     return item
 end
@@ -250,11 +250,40 @@ function Deque:PeekBack()
 
     local directory = self._directory
     local back_chunk_index = back_cursor // CHUNK_SIZE
-    local item_index = back_cursor % CHUNK_SIZE + 1
+    local slot = back_cursor % CHUNK_SIZE + 1
     local chunk = directory[back_chunk_index]
-    local item = chunk[item_index]
+    local item = chunk[slot]
 
     return item
+end
+
+function Deque:Find(item)
+    local front_cursor = self._front_cursor + 1
+    local back_cursor = self._back_cursor - 1
+
+    if front_cursor > back_cursor then
+        return nil
+    end
+
+    local directory = self._directory
+    local first_chunk_index = front_cursor // CHUNK_SIZE
+    local last_chunk_index = back_cursor // CHUNK_SIZE
+    local first_slot = front_cursor % CHUNK_SIZE + 1
+    local last_slot = front_cursor % CHUNK_SIZE + 1
+
+    for chunk_index = first_chunk_index, last_chunk_index do
+        local chunk = directory[chunk_index]
+        local lower_bound = if chunk_index == first_chunk_index then first_slot else 1
+        local upper_bound = if chunk_index == last_chunk_index then last_slot else 64
+
+        for slot = lower_bound, upper_bound do
+            if chunk[slot] == item then
+                return chunk_index * CHUNK_SIZE + slot - front_cursor
+            end
+        end
+    end
+
+    return nil
 end
 
 function Deque:Clear()
@@ -266,14 +295,6 @@ end
 
 function Deque:IsEmpty()
     return self._front_cursor + 1 > self._back_cursor - 1
-end
-
-function Deque:Begin()
-    return self._front_cursor
-end
-
-function Deque:End()
-    return self._back_cursor
 end
 
 --------------------------------------------------------------------------------

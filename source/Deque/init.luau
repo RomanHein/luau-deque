@@ -226,11 +226,15 @@ function Deque:PopBack()
     return item
 end
 
-function Deque:IsEmpty()
-    local front_cursor = self._front_cursor + 1
-    local back_cursor = self._back_cursor - 1
+function Deque:Clear()
+    self._directory = table_create(INITIAL_DIRECTORY_SIZE)
+    self._directory_size = INITIAL_DIRECTORY_SIZE
+    self._front_cursor = INITIAL_FRONT_CURSOR
+    self._back_cursor = INITIAL_BACK_CURSOR
+end
 
-    return front_cursor > back_cursor
+function Deque:IsEmpty()
+    return self._front_cursor + 1 > self._back_cursor - 1
 end
 
 return Deque

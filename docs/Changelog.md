@@ -11,6 +11,7 @@ All notable changes will be documented here.
 ### Changed
 
 - Implementation of generalized iteration for better performance.
+- Parameter `item` to `value` for better clarity.
 
 ### Fixed
 

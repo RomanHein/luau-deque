@@ -21,26 +21,6 @@ local table_create = table.create
 local table_move = table.move
 
 --------------------------------------------------------------------------------
--- FUNCTIONS
---------------------------------------------------------------------------------
-
-local function iterate(self, traversal_cursor)
-    local back_cursor = self._back_cursor - 1
-
-    if traversal_cursor > back_cursor then
-        return nil
-    end
-
-    local directory = self._directory
-    local chunk_index = traversal_cursor // CHUNK_SIZE
-    local item_slot = traversal_cursor % CHUNK_SIZE + 1
-    local chunk = directory[chunk_index]
-    local item = chunk[item_slot]
-
-    return traversal_cursor + 1, item
-end
-
---------------------------------------------------------------------------------
 -- CLASS INITIALIZATION
 --------------------------------------------------------------------------------
 
@@ -130,7 +110,7 @@ function Deque:PushBack(item)
             local front_cursor = self._front_cursor
             local front_chunk_index = (front_cursor + 1) // CHUNK_SIZE
             local needed_chunks = back_chunk_index - front_chunk_index + 1
-            local in_place = needed_chunks * RECENTER_MAX_OCCUPANCY_DENOMINATOR <= directory_size * RECENTER_MAX_OCCUPANCY_DENOMINATOR
+            local in_place = needed_chunks * RECENTER_MAX_OCCUPANCY_DENOMINATOR <= directory_size * RECENTER_MAX_OCCUPANCY_NUMERATOR
             local new_front_chunk_index
 
             if in_place then
@@ -310,7 +290,23 @@ function Deque:__len()
 end
 
 function Deque:__iter()
-    return iterate, self, self._front_cursor + 1
+    local directory = self._directory
+    local front_cursor = self._front_cursor - 1
+    local back_cursor = self._back_cursor + 1
+    local cursor = front_cursor
+
+    return function()
+        if cursor > back_cursor then
+            return nil
+        end
+
+        local chunk_index = cursor // CHUNK_SIZE
+        local slot = cursor % CHUNK_SIZE + 1
+        local chunk = directory[chunk_index]
+        local item = chunk[slot]
+
+        return cursor + 1, item
+    end
 end
 
 return Deque

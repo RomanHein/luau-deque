@@ -366,6 +366,7 @@ function Deque:__iter()
     local front_cursor = self._front_cursor - 1
     local back_cursor = self._back_cursor + 1
     local cursor = front_cursor
+    local position = 0
 
     return function()
         if cursor > back_cursor then
@@ -376,6 +377,8 @@ function Deque:__iter()
         local slot = cursor % CHUNK_SIZE + 1
         local chunk = directory[chunk_index]
         local item = chunk[slot]
+
+        cursor += 1
 
         return cursor + 1, item
     end

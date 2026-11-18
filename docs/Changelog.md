@@ -6,7 +6,8 @@ All notable changes will be documented here.
 
 ### Added
 
-- Finding the logical index of the first occurence of an item via `:Find()`.
+- Finding the first logical position of an item via `:Find()`.
+- Erasing values at any position via `:Erase()`.
 
 ### Changed
 

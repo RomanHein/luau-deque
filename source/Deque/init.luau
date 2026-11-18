@@ -295,7 +295,7 @@ function Deque:Erase(position)
             for chunk_index = first_chunk_index + 1, last_chunk_index - 1 do
                 local chunk = directory[chunk_index]
                 local next_shifted_value = chunk[CHUNK_SIZE]
-                table_move(chunk, 1, chunk_index, 2)
+                table_move(chunk, 1, CHUNK_SIZE - 1, 2)
                 chunk[1] = shifted_value
                 shifted_value = next_shifted_value
             end

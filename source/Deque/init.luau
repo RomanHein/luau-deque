@@ -300,7 +300,7 @@ function Deque:Erase(position)
                 shifted_value = next_shifted_value
             end
 
-            table_move(last_chunk, 1, last_slot, 2)
+            table_move(last_chunk, 1, last_slot - 1, 2)
             last_chunk[1] = shifted_value
         end
 

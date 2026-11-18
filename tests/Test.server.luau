@@ -14,10 +14,9 @@ local Deque = require("../Source/Deque")
 
 local deque = Deque.new()
 
-for i = 1, 256 do
-    deque:PushFront(i)
+for i = 1, 32 do
+    deque:PushBack(i)
 end
 
-for it, item in deque do
-    print(item)
-end
+deque:Erase(2)
+deque:PushFront(0)

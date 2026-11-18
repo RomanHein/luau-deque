@@ -237,6 +237,77 @@ function Deque:PeekBack()
     return item
 end
 
+function Deque:Erase(position)
+    local directory = self._directory
+    local front_cursor = self._front_cursor + 1
+    local back_cursor = self._back_cursor - 1
+    local target_cursor = front_cursor + position - 1
+    local left_slots = target_cursor - front_cursor
+    local right_slots = back_cursor - target_cursor
+
+    if left_slots > right_slots then
+        local first_chunk_index = target_cursor // CHUNK_SIZE
+        local last_chunk_index = back_cursor // CHUNK_SIZE
+        local first_slot = target_cursor % CHUNK_SIZE + 1
+        local last_slot = back_cursor % CHUNK_SIZE + 1
+        local last_chunk = directory[last_chunk_index]
+
+        if first_chunk_index == last_chunk_index then
+            table_move(last_chunk, first_slot + 1, last_slot, first_slot)
+            last_chunk[last_slot] = nil
+        else
+            local first_chunk = directory[first_chunk_index]
+            local shifted_value = last_chunk[1]
+
+            table_move(last_chunk, 2, last_slot, 1)
+            last_chunk[last_slot] = nil
+
+            for chunk_index = last_chunk_index - 1, first_chunk_index + 1, -1 do
+                local chunk = directory[chunk_index]
+                local next_shifted_value = chunk[1]
+                table_move(chunk, 2, CHUNK_SIZE, 1)
+                chunk[CHUNK_SIZE] = shifted_value
+                shifted_value = next_shifted_value
+            end
+
+            table_move(first_chunk, first_slot + 1, CHUNK_SIZE, first_slot)
+            first_chunk[CHUNK_SIZE] = shifted_value
+        end
+
+        self._back_cursor = back_cursor
+    else
+        local first_chunk_index = front_cursor // CHUNK_SIZE
+        local last_chunk_index = target_cursor // CHUNK_SIZE
+        local first_slot = front_cursor % CHUNK_SIZE + 1
+        local last_slot = target_cursor % CHUNK_SIZE + 1
+        local first_chunk = directory[first_chunk_index]
+
+        if first_chunk_index == last_chunk_index then
+            table_move(first_chunk, first_slot, last_slot, first_slot + 1)
+            first_chunk[first_slot] = nil
+        else
+            local last_chunk = directory[last_chunk_index]
+            local shifted_value = first_chunk[CHUNK_SIZE]
+
+            table_move(first_chunk, first_slot, CHUNK_SIZE - 1, first_slot + 1)
+            first_chunk[first_slot] = nil
+
+            for chunk_index = first_chunk_index + 1, last_chunk_index - 1 do
+                local chunk = directory[chunk_index]
+                local next_shifted_value = chunk[CHUNK_SIZE]
+                table_move(chunk, 1, chunk_index, 2)
+                chunk[1] = shifted_value
+                shifted_value = next_shifted_value
+            end
+
+            table_move(last_chunk, 1, last_slot, 2)
+            last_chunk[1] = shifted_value
+        end
+
+        self._front_cursor = front_cursor
+    end
+end
+
 function Deque:Find(value, position)
     local front_cursor = self._front_cursor + 1
     local back_cursor = self._back_cursor - 1

@@ -18,5 +18,6 @@ for i = 1, 516 do
     deque:PushBack(i)
 end
 
-local x = deque:Find(314)
-deque:Erase(x)
+for i, v in deque do
+    print(i, v)
+end

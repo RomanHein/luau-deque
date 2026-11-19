@@ -16,6 +16,7 @@ local HALF_CHUNK_SIZE = CHUNK_SIZE // 2
 local CURSOR_OFFSET = CHUNK_SIZE - 1
 local INITIAL_FRONT_CURSOR = HALF_CHUNK_SIZE * INITIAL_DIRECTORY_SIZE + CURSOR_OFFSET
 local INITIAL_BACK_CURSOR = INITIAL_FRONT_CURSOR + 1
+local NO_OP = function() end
 
 local table_create = table.create
 local table_move = table.move
@@ -362,25 +363,37 @@ function Deque:__len()
 end
 
 function Deque:__iter()
+    local front_cursor = self._front_cursor + 1
+    local back_cursor = self._back_cursor - 1
+
+    if front_cursor > back_cursor then
+        return NO_OP
+    end
+
     local directory = self._directory
-    local front_cursor = self._front_cursor - 1
-    local back_cursor = self._back_cursor + 1
-    local cursor = front_cursor
+    local active_slots = back_cursor - front_cursor + 1
+    local chunk_index = front_cursor // CHUNK_SIZE
+    local slot = front_cursor % CHUNK_SIZE + 1
+    local chunk = directory[chunk_index]
     local position = 0
 
     return function()
-        if cursor > back_cursor then
-            return nil
+        if position >= active_slots then
+            return
         end
 
-        local chunk_index = cursor // CHUNK_SIZE
-        local slot = cursor % CHUNK_SIZE + 1
-        local chunk = directory[chunk_index]
-        local item = chunk[slot]
+        local value = chunk[slot]
+        position = position + 1
 
-        cursor += 1
+        if slot == CHUNK_SIZE then
+            slot = 1
+            chunk_index = chunk_index + 1
+            chunk = directory[chunk_index]
+        else
+            slot = slot + 1
+        end
 
-        return cursor + 1, item
+        return position, value
     end
 end
 
